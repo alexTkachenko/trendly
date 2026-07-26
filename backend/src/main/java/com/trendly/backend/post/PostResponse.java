@@ -9,15 +9,28 @@ public record PostResponse(
         String textContent,
         String imageUrl,
         UserSummaryDto author,
-        Instant createdAt
+        Instant createdAt,
+        UserSummaryDto repostedBy,
+        Instant repostedAt,
+        boolean repostedByMe
 ) {
-    public static PostResponse from(Post post) {
+    public static PostResponse from(Post post, boolean repostedByMe) {
+        boolean isRepost = post.getOriginalPost() != null;
+        Post content = isRepost ? post.getOriginalPost() : post;
+
         return new PostResponse(
-                post.getId(),
-                post.getTextContent(),
-                post.getImageUrl(),
-                UserSummaryDto.from(post.getAuthor()),
-                post.getCreatedAt()
+                content.getId(),
+                content.getTextContent(),
+                content.getImageUrl(),
+                UserSummaryDto.from(content.getAuthor()),
+                content.getCreatedAt(),
+                isRepost ? UserSummaryDto.from(post.getAuthor()) : null,
+                isRepost ? post.getCreatedAt() : null,
+                repostedByMe
         );
+    }
+
+    public static PostResponse from(Post post) {
+        return from(post, false);
     }
 }

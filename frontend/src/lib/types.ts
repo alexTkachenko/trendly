@@ -26,6 +26,13 @@ export type Post = {
   imageUrl: string | null;
   author: UserSummary;
   createdAt: string;
+  repostedBy: UserSummary | null;
+  repostedAt: string | null;
+  repostedByMe: boolean;
+};
+
+export type RepostStatus = {
+  reposted: boolean;
 };
 
 export type PageResponse<T> = {
