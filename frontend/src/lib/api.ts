@@ -14,6 +14,11 @@ export function clearToken() {
   window.localStorage.removeItem(TOKEN_KEY);
 }
 
+export function mediaUrl(path: string | null): string | null {
+  if (!path) return null;
+  return `${API_BASE}${path}`;
+}
+
 export class ApiError extends Error {
   status: number;
 

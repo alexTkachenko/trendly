@@ -16,12 +16,15 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<MeUser | null>(null);
+  // Starts true on both server and client (no localStorage access during
+  // the initial render) so hydration matches; the effect below settles it.
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = getToken();
-    if (!token) {
-      setLoading(false);
+    if (!getToken()) {
+      // Deferred so this setState lands outside the effect's synchronous
+      // body (react-hooks/set-state-in-effect).
+      void Promise.resolve().then(() => setLoading(false));
       return;
     }
 

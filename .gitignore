@@ -6,6 +6,7 @@
 # backend
 backend/target/
 backend/build/
+backend/uploads/
 *.class
 
 # frontend
