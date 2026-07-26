@@ -4,7 +4,13 @@ import { useEffect, useState } from "react";
 import { apiFetch, ApiError } from "@/lib/api";
 import { FollowStatus } from "@/lib/types";
 
-export default function FollowButton({ username }: { username: string }) {
+export default function FollowButton({
+  username,
+  onFollowChange,
+}: {
+  username: string;
+  onFollowChange?: (following: boolean) => void;
+}) {
   const [following, setFollowing] = useState<boolean | null>(null);
   const [pending, setPending] = useState(false);
 
@@ -30,6 +36,7 @@ export default function FollowButton({ username }: { username: string }) {
         method: following ? "DELETE" : "POST",
       });
       setFollowing(status.following);
+      onFollowChange?.(status.following);
     } catch (err) {
       // leave state unchanged on failure; the ApiError message isn't shown here to keep this compact
       if (!(err instanceof ApiError)) throw err;

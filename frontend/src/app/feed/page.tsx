@@ -6,6 +6,7 @@ import { apiFetch, ApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
 import { PageResponse, Post } from "@/lib/types";
 import PostCard from "@/components/PostCard";
+import RecommendationsPanel from "@/components/RecommendationsPanel";
 
 const PAGE_SIZE = 20;
 
@@ -58,6 +59,8 @@ export default function FeedPage() {
   return (
     <main className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-6 p-8">
       <h1 className="text-2xl font-bold">Your feed</h1>
+
+      <RecommendationsPanel />
 
       {error && <p className="text-sm text-red-600">{error}</p>}
 
