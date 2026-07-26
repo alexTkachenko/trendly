@@ -4,16 +4,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Current state
 
-This repo is pre-implementation: `backend/` and `frontend/` contain only `.gitkeep`
-placeholders, and there is no `docker-compose.yml` yet. What exists today is the plan,
-the agent configs, and env scaffolding. There are no build/lint/test commands to run
-until the corresponding setup task (T1 in `docs/MVP_PLAN.md`) has been done — don't
-assume a Maven/Next.js project layout exists until you've checked. `mvn` is not on
-PATH; T1 is expected to generate the `./mvnw` wrapper (`.claude/settings.local.json`
-pre-allows `./mvnw compile` and `./mvnw test -Dtest=<ClassName>`, and specifically
-`-Dtest=AuthServiceTest`, implying the auth task should include a unit test with that
-exact name). Java 21, Docker, and Docker Compose v2 (`docker compose`, not the standalone
-`docker-compose`) are available locally.
+T1–T6 from `docs/MVP_PLAN.md` are implemented and reviewed: docker-compose Postgres,
+Spring Boot backend (auth, posts, follow/feed, comments), Next.js frontend. The backend
+build was switched from Maven to Gradle after the initial build — it now uses the
+Gradle wrapper (`./gradlew`), not `./mvnw`; `pom.xml`/`mvnw`/`mvnw.cmd`/`.mvn/` were
+removed. `.claude/settings.local.json` pre-allows `./gradlew compileJava` and
+`./gradlew test --tests <ClassName>` (specifically `AuthServiceTest`). Java 21, Docker,
+and Docker Compose v2 (`docker compose`, not the standalone `docker-compose`) are
+available locally; neither `mvn` nor `gradle` need to be on PATH since the wrapper
+downloads its own distribution on first run.
 
 ## Project
 
