@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import { apiFetch, ApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
 import { PageResponse, Post } from "@/lib/types";
@@ -73,7 +74,14 @@ export default function ProfilePage() {
     <main className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-6 p-8">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">{username}</h1>
-        {!isOwnProfile && <FollowButton username={username} />}
+        {!isOwnProfile && (
+          <div className="flex items-center gap-3">
+            <Link href={`/messages/${username}`} className="text-sm text-zinc-500 hover:underline">
+              Message
+            </Link>
+            <FollowButton username={username} />
+          </div>
+        )}
       </div>
 
       {isOwnProfile && <PostComposer onCreated={handleCreated} />}

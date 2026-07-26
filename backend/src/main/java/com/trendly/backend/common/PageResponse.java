@@ -31,4 +31,13 @@ public record PageResponse<T>(
                 page.getTotalPages()
         );
     }
+
+    /** For results that can't be paginated at the DB level (e.g. a reduction over an in-memory list). */
+    public static <T> PageResponse<T> ofList(List<T> allItems, int page, int size) {
+        int total = allItems.size();
+        int from = Math.min(page * size, total);
+        int to = Math.min(from + size, total);
+        int totalPages = size == 0 ? 0 : (int) Math.ceil(total / (double) size);
+        return new PageResponse<>(allItems.subList(from, to), page, size, total, totalPages);
+    }
 }

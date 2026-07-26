@@ -53,3 +53,18 @@ export type Comment = {
   author: UserSummary;
   createdAt: string;
 };
+
+export type DirectMessage = {
+  id: number;
+  sender: UserSummary;
+  recipient: UserSummary;
+  content: string;
+  createdAt: string;
+};
+
+export type ConversationSummary = {
+  otherUser: UserSummary;
+  lastMessageContent: string;
+  lastMessageAt: string;
+  lastMessageFromMe: boolean;
+};
