@@ -39,3 +39,10 @@ export type PageResponse<T> = {
 export type FollowStatus = {
   following: boolean;
 };
+
+export type Comment = {
+  id: number;
+  content: string;
+  author: UserSummary;
+  createdAt: string;
+};

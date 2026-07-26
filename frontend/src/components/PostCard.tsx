@@ -46,9 +46,9 @@ export default function PostCard({ post, onDeleted }: { post: Post; onDeleted?: 
         <img src={mediaUrl(post.imageUrl)!} alt="" className="max-h-96 w-full rounded-md object-cover" />
       )}
       {error && <p className="text-sm text-red-600">{error}</p>}
-      <time className="text-xs text-zinc-500" dateTime={post.createdAt}>
-        {new Date(post.createdAt).toLocaleString()}
-      </time>
+      <Link href={`/posts/${post.id}`} className="w-fit text-xs text-zinc-500 hover:underline">
+        <time dateTime={post.createdAt}>{new Date(post.createdAt).toLocaleString()}</time>
+      </Link>
     </article>
   );
 }
