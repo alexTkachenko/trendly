@@ -1,0 +1,51 @@
+spring:
+  application:
+    name: trendly-backend
+
+  # Env-var-only datasource config (relaxed binding), matches
+  # docker-compose.yml's backend service and backend/.env.example for
+  # host runs. No hardcoded credentials.
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+
+  jpa:
+    hibernate:
+      # Flyway is the only schema writer -- Hibernate only validates the
+      # entity mappings against the schema Flyway produced, never
+      # generates/alters DDL itself.
+      ddl-auto: validate
+    open-in-view: false
+
+  flyway:
+    enabled: true
+    # locations default to classpath:db/migration -- no override needed.
+
+  jackson:
+    # Every documented API contract (docs/api/*.md, starting with
+    # auth.md's access_token/token_type/display_name/avatar_url) uses
+    # snake_case JSON. Applying this app-wide (BE-2.1) means DTOs stay
+    # plain camelCase Java records/fields with no per-field @JsonProperty
+    # bookkeeping, and every future endpoint gets snake_case for free.
+    property-naming-strategy: SNAKE_CASE
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      # Surfaces the datasource health indicator (DB up/down) as part of
+      # the overall /actuator/health status.
+      show-details: when-authorized
+
+# Consumed by JwtService (BE-1.3) to verify bearer token signatures.
+# Fails fast at startup if JWT_SECRET is missing, per BE-1.1's scope.
+app:
+  jwt:
+    secret: ${JWT_SECRET}

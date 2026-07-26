@@ -1,0 +1,20 @@
+-- V1__init.sql
+--
+-- Baseline migration for the Trendly schema (DB-1.2).
+--
+-- Intentionally a no-op: there are no application tables yet. Its only
+-- purpose is to give Flyway a clean starting point (a populated
+-- `flyway_schema_history` row for version 1) before DB-2.x introduces the
+-- real tables (users, posts, follows, comments, post_media, ...).
+--
+-- Why no-op rather than a "schema_version sanity table": Flyway already
+-- tracks applied versions itself in `flyway_schema_history` (created
+-- automatically on first migrate), so a hand-rolled sanity table would just
+-- duplicate that bookkeeping. Keeping V1 empty also means DB-2.x's first
+-- real migration (V2) starts from a genuinely blank schema instead of one
+-- that already has an app-defined table to work around.
+--
+-- Reminder per the migration workflow (see docs/db/conventions.md):
+-- once this file has been applied anywhere (including a teammate's local
+-- DB or CI), never edit it again -- ship schema changes as new, later-
+-- numbered migrations (V2__..., V3__...) instead.

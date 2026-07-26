@@ -1,0 +1,10 @@
+target/
+*.class
+.idea/
+*.iml
+.mvn/wrapper/maven-wrapper.jar
+.git/
+# No-op today (Dockerfile only COPYs pom.xml and src/), kept for when the
+# build context broadens so env files are never accidentally baked in.
+.env*
+!.env.example

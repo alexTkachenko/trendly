@@ -1,0 +1,70 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-ci.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-ci.yml'
+
+defaults:
+  run:
+    working-directory: backend
+
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    # Postgres 16 service container, same DB name/user as docker-compose.yml
+    # (trendly/trendly), so it's a drop-in match for the datasource env vars
+    # BE-1.1's application.yml reads. No integration tests touch it yet --
+    # wired now so the first one just works.
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: trendly
+          POSTGRES_USER: trendly
+          POSTGRES_PASSWORD: trendly_ci_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U trendly -d trendly"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/trendly
+      SPRING_DATASOURCE_USERNAME: trendly
+      SPRING_DATASOURCE_PASSWORD: trendly_ci_password
+      # CI-only placeholder, never a real secret -- BE-1.1 fails fast at
+      # startup if this property is unset, same as JWT_SECRET locally.
+      JWT_SECRET: ci-only-not-a-real-secret
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          cache-dependency-path: backend/pom.xml
+
+      - name: Verify Postgres service container is reachable
+        run: |
+          sudo apt-get update -y && sudo apt-get install -y --no-install-recommends postgresql-client
+          pg_isready -h localhost -p 5432 -U trendly -d trendly
+          PGPASSWORD="$SPRING_DATASOURCE_PASSWORD" psql -h localhost -U trendly -d trendly -c "SELECT 1;"
+
+      - name: Build and test (lint -> unit -> build)
+        run: ./mvnw -B verify
