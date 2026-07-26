@@ -62,6 +62,16 @@ public class PostController {
         return ResponseEntity.ok(PostResponse.from(post));
     }
 
+    @GetMapping("/feed")
+    public ResponseEntity<PageResponse<PostResponse>> feed(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            Authentication authentication
+    ) {
+        Page<Post> posts = postRepository.findFeedForUser(authentication.getName(), PageRequest.of(page, size));
+        return ResponseEntity.ok(PageResponse.of(posts, PostResponse::from));
+    }
+
     @GetMapping("/users/{username}/posts")
     public ResponseEntity<PageResponse<PostResponse>> getByUsername(
             @PathVariable String username,

@@ -35,3 +35,7 @@ export type PageResponse<T> = {
   totalElements: number;
   totalPages: number;
 };
+
+export type FollowStatus = {
+  following: boolean;
+};

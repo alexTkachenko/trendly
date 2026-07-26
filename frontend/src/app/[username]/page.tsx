@@ -7,6 +7,7 @@ import { useAuth } from "@/lib/auth-context";
 import { PageResponse, Post } from "@/lib/types";
 import PostComposer from "@/components/PostComposer";
 import PostCard from "@/components/PostCard";
+import FollowButton from "@/components/FollowButton";
 
 const PAGE_SIZE = 20;
 
@@ -70,7 +71,10 @@ export default function ProfilePage() {
 
   return (
     <main className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-6 p-8">
-      <h1 className="text-2xl font-bold">{username}</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">{username}</h1>
+        {!isOwnProfile && <FollowButton username={username} />}
+      </div>
 
       {isOwnProfile && <PostComposer onCreated={handleCreated} />}
 
