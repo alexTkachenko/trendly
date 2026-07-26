@@ -1,0 +1,33 @@
+server:
+  port: ${BACKEND_PORT:8080}
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:${POSTGRES_PORT:55432}/${POSTGRES_DB:trendly}
+    username: ${POSTGRES_USER:trendly}
+    password: ${POSTGRES_PASSWORD:trendly_dev_password}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:dev-only-change-me-please-do-not-use-in-prod}
+    expiration-ms: 86400000
+  media:
+    upload-dir: uploads
+    url-prefix: /media
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
