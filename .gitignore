@@ -15,3 +15,6 @@ frontend/out/
 
 # OS
 .DS_Store
+
+# IDE
+.idea/
