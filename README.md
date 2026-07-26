@@ -1,3 +1,5 @@
+# IN PROGRESS! RELEVANT VERSION IN MVP BRANCH! 
+
 # Trendly
 
 A social network for fashion discovery — post, follow, comment, and see
