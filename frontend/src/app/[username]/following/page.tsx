@@ -5,39 +5,35 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { apiFetch, ApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
-import { PageResponse, Post } from "@/lib/types";
-import PostComposer from "@/components/PostComposer";
-import PostCard from "@/components/PostCard";
+import { PageResponse, UserSummary } from "@/lib/types";
 import FollowButton from "@/components/FollowButton";
 
 const PAGE_SIZE = 20;
 
-export default function ProfilePage() {
+export default function FollowingPage() {
   const { username } = useParams<{ username: string }>();
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
 
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [following, setFollowing] = useState<UserSummary[]>([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const isOwnProfile = user?.username === username;
 
   const loadPage = useCallback(
     async (pageToLoad: number) => {
       setLoading(true);
       setError(null);
       try {
-        const data = await apiFetch<PageResponse<Post>>(
-          `/users/${username}/posts?page=${pageToLoad}&size=${PAGE_SIZE}`
+        const data = await apiFetch<PageResponse<UserSummary>>(
+          `/users/${username}/following?page=${pageToLoad}&size=${PAGE_SIZE}`
         );
-        setPosts((prev) => (pageToLoad === 0 ? data.content : [...prev, ...data.content]));
+        setFollowing((prev) => (pageToLoad === 0 ? data.content : [...prev, ...data.content]));
         setPage(data.page);
         setTotalPages(data.totalPages);
       } catch (err) {
-        setError(err instanceof ApiError ? err.message : "Could not load posts");
+        setError(err instanceof ApiError ? err.message : "Could not load following list");
       } finally {
         setLoading(false);
       }
@@ -58,12 +54,9 @@ export default function ProfilePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authLoading, user, username]);
 
-  function handleCreated(post: Post) {
-    setPosts((prev) => [post, ...prev]);
-  }
-
-  function handleDeleted(id: number) {
-    setPosts((prev) => prev.filter((p) => p.id !== id));
+  function handleUnfollowed(targetUsername: string, isFollowing: boolean) {
+    if (isFollowing) return;
+    setFollowing((prev) => prev.filter((u) => u.username !== targetUsername));
   }
 
   if (authLoading || !user) {
@@ -72,35 +65,34 @@ export default function ProfilePage() {
 
   return (
     <main className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-6 p-8">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold">{username}</h1>
-          <Link href={`/${username}/following`} className="text-sm text-zinc-500 hover:underline">
-            Following
-          </Link>
-        </div>
-        {!isOwnProfile && (
-          <div className="flex items-center gap-3">
-            <Link href={`/messages/${username}`} className="text-sm text-zinc-500 hover:underline">
-              Message
-            </Link>
-            <FollowButton username={username} />
-          </div>
-        )}
+      <div className="flex items-center gap-2">
+        <Link href={`/${username}`} className="text-sm text-zinc-500 hover:underline">
+          ← {username}
+        </Link>
       </div>
-
-      {isOwnProfile && <PostComposer onCreated={handleCreated} />}
+      <h1 className="text-2xl font-bold">Following</h1>
 
       {error && <p className="text-sm text-red-600">{error}</p>}
 
-      <div className="flex flex-col gap-4">
-        {posts.map((post) => (
-          <PostCard key={post.id} post={post} onDeleted={handleDeleted} />
+      <ul className="flex flex-col gap-3">
+        {following.map((followee) => (
+          <li
+            key={followee.id}
+            className="flex items-center justify-between rounded-lg border border-black/[.08] p-4 dark:border-white/[.145]"
+          >
+            <Link href={`/${followee.username}`} className="text-sm font-medium hover:underline">
+              {followee.displayName || followee.username}
+            </Link>
+            <FollowButton
+              username={followee.username}
+              onFollowChange={(isFollowing) => handleUnfollowed(followee.username, isFollowing)}
+            />
+          </li>
         ))}
-      </div>
+      </ul>
 
-      {!loading && posts.length === 0 && !error && (
-        <p className="text-sm text-zinc-500">No posts yet.</p>
+      {!loading && following.length === 0 && !error && (
+        <p className="text-sm text-zinc-500">Not following anyone yet.</p>
       )}
 
       {page + 1 < totalPages && (
